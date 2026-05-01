@@ -38,16 +38,6 @@ function UploadIcon() {
   );
 }
 
-function DownloadIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-      <polyline points="7 10 12 15 17 10"/>
-      <line x1="12" y1="15" x2="12" y2="3"/>
-    </svg>
-  );
-}
-
 function ImageDropZone({ image, preview, capacity, onFile, onClear }) {
   const inputRef = useRef();
   const [dragging, setDragging] = useState(false);
@@ -73,38 +63,40 @@ function ImageDropZone({ image, preview, capacity, onFile, onClear }) {
           style={{
             border: `2px dashed ${dragging ? "var(--c-accent)" : "var(--c-border)"}`,
             borderRadius: 12,
-            padding: "48px 24px",
+            padding: "clamp(28px, 6vw, 48px) 24px",
             textAlign: "center",
             cursor: "pointer",
             background: dragging ? "rgba(139,92,246,0.06)" : "var(--c-surface)",
             transition: "all 0.2s",
+            WebkitTapHighlightColor: "transparent",
           }}
         >
           <div style={{ color: "var(--c-muted)", marginBottom: 12 }}><UploadIcon /></div>
-          <div style={{ color: "var(--c-text)", fontSize: 15, marginBottom: 4 }}>Drop image here</div>
-          <div style={{ color: "var(--c-muted)", fontSize: 13 }}>PNG, JPG, BMP, WebP — max 20 MB</div>
+          <div style={{ color: "var(--c-text)", fontSize: "clamp(14px, 4vw, 15px)", marginBottom: 4 }}>Tap or drop image here</div>
+          <div style={{ color: "var(--c-muted)", fontSize: "clamp(11px, 3vw, 13px)" }}>PNG, JPG, BMP, WebP — max 20 MB</div>
           <input ref={inputRef} type="file" accept="image/*" style={{ display: "none" }}
             onChange={(e) => { if (e.target.files[0]) onFile(e.target.files[0]); }} />
         </div>
       ) : (
         <div style={{ position: "relative", borderRadius: 12, overflow: "hidden", background: "var(--c-surface)" }}>
-          <img src={preview} alt="Cover" style={{ width: "100%", maxHeight: 280, objectFit: "contain", display: "block" }} />
+          <img src={preview} alt="Cover" style={{ width: "100%", maxHeight: 240, objectFit: "contain", display: "block" }} />
           <div style={{
             position: "absolute", bottom: 0, left: 0, right: 0,
-            background: "rgba(0,0,0,0.75)", padding: "10px 16px",
-            display: "flex", justifyContent: "space-between", alignItems: "center"
+            background: "rgba(0,0,0,0.75)", padding: "8px 12px",
+            display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8,
           }}>
-            <div style={{ fontSize: 12, color: "#ccc" }}>
+            <div style={{ fontSize: "clamp(10px, 2.5vw, 12px)", color: "#ccc", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>
               {image?.name} · {formatBytes(image?.size || 0)}
               {capacity && (
-                <span style={{ marginLeft: 12, color: "var(--c-accent-soft)" }}>
-                  Holds up to {capacity.max_chars.toLocaleString()} chars
+                <span style={{ marginLeft: 8, color: "var(--c-accent-soft)" }}>
+                  · {capacity.max_chars.toLocaleString()} chars max
                 </span>
               )}
             </div>
             <button onClick={onClear} style={{
               background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 6,
-              color: "#fff", fontSize: 12, padding: "4px 10px", cursor: "pointer"
+              color: "#fff", fontSize: 12, padding: "4px 10px", cursor: "pointer",
+              flexShrink: 0, WebkitTapHighlightColor: "transparent",
             }}>Change</button>
           </div>
         </div>
@@ -130,17 +122,21 @@ function PasswordField({ value, onChange, placeholder = "Encryption password" })
             width: "100%", boxSizing: "border-box",
             background: "var(--c-surface)", border: "1.5px solid var(--c-border)",
             borderRadius: 10, padding: "12px 48px 12px 16px",
-            color: "var(--c-text)", fontSize: 15, outline: "none",
+            color: "var(--c-text)", fontSize: "clamp(14px, 4vw, 15px)", outline: "none",
             fontFamily: "var(--f-mono)",
             transition: "border-color 0.2s",
           }}
           onFocus={(e) => e.target.style.borderColor = "var(--c-accent)"}
           onBlur={(e) => e.target.style.borderColor = "var(--c-border)"}
         />
-        <button onClick={() => setShow(s => !s)} style={{
-          position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)",
-          background: "none", border: "none", color: "var(--c-muted)", cursor: "pointer", padding: 0
-        }}>
+        <button
+          onClick={() => setShow(s => !s)}
+          style={{
+            position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)",
+            background: "none", border: "none", color: "var(--c-muted)", cursor: "pointer",
+            padding: 6, WebkitTapHighlightColor: "transparent",
+          }}
+        >
           <EyeIcon />
         </button>
       </div>
@@ -160,7 +156,7 @@ function StatusBox({ type, message }) {
       background: c.bg, border: `1px solid ${c.border}`,
       borderRadius: 10, padding: "14px 18px",
     }}>
-      <p style={{ margin: 0, color: c.text, fontSize: 14, lineHeight: 1.6, fontFamily: "var(--f-mono)", wordBreak: "break-word" }}>
+      <p style={{ margin: 0, color: c.text, fontSize: "clamp(12px, 3.5vw, 14px)", lineHeight: 1.6, fontFamily: "var(--f-mono)", wordBreak: "break-word" }}>
         {message}
       </p>
     </div>
@@ -175,7 +171,7 @@ export default function App() {
   const [message, setMessage]   = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading]   = useState(false);
-  const [status, setStatus]     = useState(null); // { type, text }
+  const [status, setStatus]     = useState(null);
   const [decoded, setDecoded]   = useState("");
 
   const handleFile = async (file) => {
@@ -304,16 +300,21 @@ export default function App() {
           --f-mono:        'Space Mono', monospace;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { -webkit-text-size-adjust: 100%; }
 
         body {
           background: var(--c-bg);
           color: var(--c-text);
           font-family: var(--f-display);
           min-height: 100vh;
+          overflow-x: hidden;
         }
 
         textarea:focus, input:focus { outline: none; }
+
+        input, textarea, button { -webkit-appearance: none; appearance: none; }
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -330,9 +331,33 @@ export default function App() {
           100% { transform: scale(1.35); opacity: 0; }
         }
 
-        @keyframes scan {
-          0%   { background-position: 0 -100%; }
-          100% { background-position: 0 200%; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Responsive grid for "how it works" strip ── */
+        .how-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
+          gap: 16px;
+        }
+
+        @media (max-width: 520px) {
+          .how-grid {
+            grid-template-columns: 1fr;
+            gap: 10px;
+          }
+        }
+
+        /* ── Tab buttons wrap nicely on small screens ── */
+        .tab-bar {
+          display: flex;
+          gap: 4px;
+        }
+
+        @media (max-width: 380px) {
+          .tab-bar button {
+            font-size: 13px !important;
+            padding: 10px 0 !important;
+          }
         }
       `}</style>
 
@@ -345,10 +370,14 @@ export default function App() {
           backgroundSize: "48px 48px",
         }} />
 
-        <div style={{ position: "relative", zIndex: 1, maxWidth: 700, margin: "0 auto", padding: "48px 24px 80px" }}>
+        <div style={{
+          position: "relative", zIndex: 1,
+          maxWidth: 700, margin: "0 auto",
+          padding: "clamp(24px, 6vw, 48px) clamp(16px, 5vw, 24px) 80px",
+        }}>
 
           {/* Header */}
-          <div className="fade-up" style={{ textAlign: "center", marginBottom: 56 }}>
+          <div className="fade-up" style={{ textAlign: "center", marginBottom: "clamp(32px, 8vw, 56px)" }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
               <div style={{
                 width: 42, height: 42, borderRadius: 10,
@@ -365,7 +394,9 @@ export default function App() {
               </div>
             </div>
             <h1 style={{
-              fontFamily: "var(--f-display)", fontSize: 48, fontWeight: 800,
+              fontFamily: "var(--f-display)",
+              fontSize: "clamp(36px, 10vw, 48px)",
+              fontWeight: 800,
               letterSpacing: "-0.03em", lineHeight: 1,
               background: "linear-gradient(120deg, #e2eaf5 30%, #a585f0)",
               WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
@@ -373,25 +404,33 @@ export default function App() {
             }}>
               StegoCrypt
             </h1>
-            <p style={{ color: "var(--c-muted)", fontSize: 15, fontFamily: "var(--f-mono)", letterSpacing: "0.04em" }}>
+            <p style={{
+              color: "var(--c-muted)",
+              fontSize: "clamp(12px, 3.5vw, 15px)",
+              fontFamily: "var(--f-mono)",
+              letterSpacing: "0.04em",
+              padding: "0 8px",
+            }}>
               hide encrypted messages inside ordinary images
             </p>
           </div>
 
           {/* Tab switcher */}
-          <div className="fade-up" style={{
-            display: "flex", gap: 4, background: "var(--c-surface)",
-            borderRadius: 14, padding: 5, marginBottom: 36,
+          <div className={`fade-up tab-bar`} style={{
+            background: "var(--c-surface)",
+            borderRadius: 14, padding: 5, marginBottom: "clamp(20px, 5vw, 36px)",
             border: "1px solid var(--c-border)",
           }}>
             {TABS.map(t => (
               <button key={t} onClick={() => switchTab(t)} style={{
                 flex: 1, padding: "12px 0",
                 borderRadius: 10, border: "none",
-                fontFamily: "var(--f-display)", fontWeight: 600, fontSize: 15,
+                fontFamily: "var(--f-display)", fontWeight: 600,
+                fontSize: "clamp(13px, 3.5vw, 15px)",
                 letterSpacing: "0.02em",
                 cursor: "pointer",
                 transition: "all 0.25s",
+                WebkitTapHighlightColor: "transparent",
                 background: tab === t
                   ? (t === "encode" ? "linear-gradient(135deg,#7c5cbf,#5a3fa0)" : "linear-gradient(135deg,#0f9e7b,#00d4aa22)")
                   : "transparent",
@@ -406,7 +445,10 @@ export default function App() {
           {/* Main card */}
           <div className="fade-up" style={{
             background: "var(--c-surface)", border: "1px solid var(--c-border)",
-            borderRadius: 20, padding: 32, display: "flex", flexDirection: "column", gap: 28,
+            borderRadius: 20,
+            padding: "clamp(16px, 5vw, 32px)",
+            display: "flex", flexDirection: "column",
+            gap: "clamp(18px, 5vw, 28px)",
           }}>
 
             <ImageDropZone
@@ -416,13 +458,13 @@ export default function App() {
 
             {tab === "encode" && (
               <div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, gap: 8 }}>
                   <label style={{ fontSize: 13, color: "var(--c-muted)", letterSpacing: "0.08em", textTransform: "uppercase", fontFamily: "var(--f-mono)" }}>
                     Secret message
                   </label>
                   {charsLeft !== null && (
-                    <span style={{ fontSize: 12, fontFamily: "var(--f-mono)", color: charsLeft < 50 ? "#ef4444" : "var(--c-muted)" }}>
-                      {charsLeft} chars remaining
+                    <span style={{ fontSize: 12, fontFamily: "var(--f-mono)", color: charsLeft < 50 ? "#ef4444" : "var(--c-muted)", flexShrink: 0 }}>
+                      {charsLeft} left
                     </span>
                   )}
                 </div>
@@ -435,7 +477,9 @@ export default function App() {
                     width: "100%", resize: "vertical",
                     background: "var(--c-surface2)", border: "1.5px solid var(--c-border)",
                     borderRadius: 10, padding: "14px 16px",
-                    color: "var(--c-text)", fontSize: 15, lineHeight: 1.6,
+                    color: "var(--c-text)",
+                    fontSize: "clamp(14px, 4vw, 15px)",
+                    lineHeight: 1.6,
                     fontFamily: "var(--f-display)",
                     transition: "border-color 0.2s",
                   }}
@@ -453,12 +497,15 @@ export default function App() {
               onClick={tab === "encode" ? handleEncode : handleDecode}
               disabled={loading}
               style={{
-                width: "100%", padding: "16px 0",
+                width: "100%",
+                padding: "clamp(13px, 4vw, 16px) 0",
                 borderRadius: 12, border: "none",
-                fontFamily: "var(--f-display)", fontWeight: 700, fontSize: 16,
+                fontFamily: "var(--f-display)", fontWeight: 700,
+                fontSize: "clamp(14px, 4vw, 16px)",
                 letterSpacing: "0.03em",
                 cursor: loading ? "not-allowed" : "pointer",
                 transition: "all 0.2s",
+                WebkitTapHighlightColor: "transparent",
                 background: loading
                   ? "var(--c-surface2)"
                   : tab === "encode"
@@ -474,7 +521,7 @@ export default function App() {
                   <div style={{
                     width: 16, height: 16, border: "2px solid var(--c-muted)",
                     borderTopColor: "var(--c-accent-soft)", borderRadius: "50%",
-                    animation: "spin 0.8s linear infinite",
+                    animation: "spin 0.8s linear infinite", flexShrink: 0,
                   }} />
                   Processing...
                 </>
@@ -491,25 +538,26 @@ export default function App() {
               <div style={{
                 background: "var(--c-surface2)",
                 border: "1px solid var(--c-border)",
-                borderRadius: 12, padding: 20,
+                borderRadius: 12, padding: "clamp(14px, 4vw, 20px)",
               }}>
                 <div style={{
                   display: "flex", justifyContent: "space-between",
-                  alignItems: "center", marginBottom: 12,
+                  alignItems: "center", marginBottom: 12, gap: 8,
                 }}>
-                  <span style={{ fontSize: 12, color: "var(--c-teal)", fontFamily: "var(--f-mono)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                  <span style={{ fontSize: "clamp(10px, 2.5vw, 12px)", color: "var(--c-teal)", fontFamily: "var(--f-mono)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
                     Decrypted message
                   </span>
                   <button onClick={() => navigator.clipboard.writeText(decoded)} style={{
                     background: "rgba(255,255,255,0.07)", border: "1px solid var(--c-border)",
                     borderRadius: 6, color: "var(--c-muted)", fontSize: 12,
                     padding: "4px 10px", cursor: "pointer", fontFamily: "var(--f-mono)",
+                    flexShrink: 0, WebkitTapHighlightColor: "transparent",
                   }}>
                     Copy
                   </button>
                 </div>
                 <p style={{
-                  color: "var(--c-text)", fontSize: 15, lineHeight: 1.7,
+                  color: "var(--c-text)", fontSize: "clamp(14px, 4vw, 15px)", lineHeight: 1.7,
                   fontFamily: "var(--f-display)", wordBreak: "break-word", whiteSpace: "pre-wrap",
                 }}>
                   {decoded}
@@ -519,7 +567,7 @@ export default function App() {
           </div>
 
           {/* How it works strip */}
-          <div className="fade-up" style={{ marginTop: 40, display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
+          <div className={`fade-up how-grid`} style={{ marginTop: "clamp(24px, 6vw, 40px)" }}>
             {[
               { step: "01", label: "AES-256 encrypt", desc: "Message encrypted with GCM mode before hiding" },
               { step: "02", label: "LSB encode",      desc: "Cipher bits replace least-significant pixel bits" },
@@ -527,24 +575,20 @@ export default function App() {
             ].map(({ step, label, desc }) => (
               <div key={step} style={{
                 background: "var(--c-surface)", border: "1px solid var(--c-border)",
-                borderRadius: 14, padding: 20,
+                borderRadius: 14, padding: "clamp(14px, 4vw, 20px)",
               }}>
                 <div style={{ fontSize: 11, fontFamily: "var(--f-mono)", color: "var(--c-accent-soft)", marginBottom: 8 }}>{step}</div>
-                <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}>{label}</div>
-                <div style={{ fontSize: 12, color: "var(--c-muted)", lineHeight: 1.6 }}>{desc}</div>
+                <div style={{ fontSize: "clamp(13px, 3.5vw, 14px)", fontWeight: 600, marginBottom: 6 }}>{label}</div>
+                <div style={{ fontSize: "clamp(11px, 3vw, 12px)", color: "var(--c-muted)", lineHeight: 1.6 }}>{desc}</div>
               </div>
             ))}
           </div>
 
-          <p style={{ textAlign: "center", marginTop: 36, fontSize: 12, color: "var(--c-muted)", fontFamily: "var(--f-mono)" }}>
+          <p style={{ textAlign: "center", marginTop: 36, fontSize: "clamp(10px, 2.5vw, 12px)", color: "var(--c-muted)", fontFamily: "var(--f-mono)", padding: "0 8px" }}>
             StegoCrypt · BS Information Technology · University of Agriculture Faisalabad
           </p>
         </div>
       </div>
-
-      <style>{`
-        @keyframes spin { to { transform: rotate(360deg); } }
-      `}</style>
     </>
   );
 }
